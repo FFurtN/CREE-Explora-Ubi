@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title>Mapa del Centro Regional de Educación Gral. Patricio Escobar</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+        #info-box {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 350px;
+            padding: 15px;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 8px;
+            font-family: Arial, sans-serif;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            z-index: 1000;
+        }
+        #info-box img {
+            width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+        }
+        #info-box button {
+            padding: 10px;
+            background-color: white;
+            color: #4CAF50;
+            border: none;
+            cursor: pointer;
+        }
+        #info-box h3 {
+            margin-top: 0;
+        }
+        #close-button {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: red;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            text-align: center;
+            line-height: 20px;
+        }
+        #minimized-box {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 50px;
+            height: 50px;
+            background-color: transparent;
+            display: none;
+            cursor: pointer;
+            z-index: 1000; /* Asegurarse de que esté por encima del mapa */
+        }
+        #minimized-box img {
+            width: 100%;
+            height: auto;
+        }
+        #welcome-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 128, 0, 0.9);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            font-family: Arial, sans-serif;
+            z-index: 2000;
+        }
+        #welcome-screen h1 {
+            margin-bottom: 20px;
+        }
+        .welcome-button {
+            padding: 15px;
+            margin: 10px;
+            background-color: white;
+            color: #4CAF50;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+
+    <!-- Cuadro informativo -->
+    <div id="info-box">
+        <button id="close-button">X</button>
+        <h3>Centro Regional de Educación Gral. Patricio Escobar</h3>
+        <img src="https://masencarnacion.s3.us-west-2.amazonaws.com/uploads/public/643/5a9/7d9/6435a97d932f5761525999.jpg" alt="Entrada principal">
+        <p>Institución educativa de gestión pública que cuenta con los niveles de Educación Inicial, Educación Escolar Básica, Educación Media y Formación Docente.</p>
+        <a href="https://maps.app.goo.gl/FQWXZS7HfKqGECn37" target="_blank">
+            <button>¿Cómo llegar?</button>
+        </a>
+    </div>
+
+    <!-- Ícono minimizado -->
+    <div id="minimized-box">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYWyRjC7Ha99wZxFfYDuTcy9go4e793CSnKA&s" alt="Logo Colegio">
+    </div>
+
+    <!-- Pantalla de bienvenida -->
+    <div id="welcome-screen">
+        <h1>Bienvenido al mapa del CREE</h1>
+        <button class="welcome-button" id="go-map">Ir al Mapa</button>
+        <button class="welcome-button" id="view-credits">Ver Créditos</button>
+    </div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        var map = L.map('map', {
+            center: [-27.334557640942183, -55.86536624232918],
+            zoom: 18
+        });
+
+        // Añadir la capa de OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Establecer los límites del mapa
+        var bounds = [
+            [-27.336, -55.867], // Esquina suroeste
+            [-27.333, -55.864]  // Esquina noreste
+        ];
+        map.setMaxBounds(bounds);
+        map.on('drag', function() {
+            map.dragging.disable(); // Deshabilita el movimiento del mapa
+            map.setView(map.getCenter(), map.getZoom()); // Mantiene el centro
+        });
+
+        // Función para añadir pines con imágenes
+        function addMarker(latitude, longitude, title, description, imagePath) {
+            var marker = L.marker([latitude, longitude]).addTo(map);
+            var popupContent = '<h3>' + title + '</h3>' +
+                               '<p>' + description + '</p>' +
+                               '<img src="' + imagePath + '" alt="' + title + '" style="width:300px;height:auto;">';
+            marker.bindPopup(popupContent);
+        }
+
+        // Agregar los pines con coordenadas, nombres y rutas de imágenes locales
+        addMarker(-27.334503, -55.866014, 'Entrada Comercio', 'Texto sobre Entrada Comercio', 'Imagenes/Entrada comercio.jpeg');
+        addMarker(-27.334514, -55.865977, 'Secretaría Comercio', 'Texto sobre Secretaría Comercio', 'Imagenes/Secretaria_comercio.jpeg');
+        addMarker(-27.334831, -55.865878, 'Lab Científico', 'Texto sobre Lab Científico', 'Imagenes/Lab_cientifico.jpeg');
+        addMarker(-27.335006, -55.865730, 'Lab Informática', 'Texto sobre Lab Informática', 'Imagenes/Lab_informatica.jpeg');
+        addMarker(-27.335163, -55.865917, 'Entrada Principal', 'Texto sobre Entrada Principal', 'Imagenes/Entrada_principal.jpeg');
+        addMarker(-27.335216, -55.865812, 'Dirección General', 'Texto sobre Dirección General', 'Imagenes/Direccion_general.jpeg');
+        addMarker(-27.335219, -55.865776, 'Biblioteca', 'Texto sobre Biblioteca', 'Imagenes/Biblioteca.jpeg');
+        addMarker(-27.335045, -55.865501, 'Patio de Honor', 'Texto sobre Patio de Honor', 'Imagenes/Patio_honor.jpeg');
+        addMarker(-27.335102, -55.865348, 'Equipo Técnico', 'Texto sobre Equipo Técnico', 'Imagenes/Equipo_tecnico.jpeg');
+        addMarker(-27.335111, -55.865212, 'Entrada Primaria', 'Texto sobre Entrada Primaria', 'Imagenes/Entrada_primaria.jpeg');
+        addMarker(-27.334790, -55.865081, 'Enfermería Salud', 'Texto sobre Enfermería Salud', 'Imagenes/Enfermeria_salud.jpeg');
+        addMarker(-27.334742, -55.864831, 'Auditorio', 'Texto sobre Auditorio', 'Imagenes/Auditorio.jpeg');
+        addMarker(-27.334727, -55.864666, 'Sala Robótica', 'Texto sobre Sala Robótica', 'Imagenes/Sala_robotica.jpeg');
+        addMarker(-27.334173, -55.865290, 'Entrada hacia Escolar Básica', 'Texto sobre Entrada hacia Escolar Básica', 'Imagenes/Entrada_escolar_basica.jpeg');
+        addMarker(-27.334517, -55.865057, 'Dirección y Secretaría Escolar Básica', 'Texto sobre Dirección y Secretaría Escolar Básica', 'Imagenes/Direccion_secretaria_basica.jpeg');
+        addMarker(-27.334839, -55.865305, 'Poli Abierto', 'Texto sobre Poli Abierto', 'Imagenes/Poli_abierto.jpeg');
+        addMarker(-27.334866, -55.865384, 'Poli Cerrado', 'Texto sobre Poli Cerrado', 'Imagenes/Poli_cerrado.jpeg');
+        addMarker(-27.334529, -55.865618, 'Secretaría Siempre Cerrada', 'Texto sobre Secretaría Siempre Cerrada', 'Imagenes/Secretaria_cerrada.jpeg');
+
+        // Mostrar el cuadro informativo
+        function showInfoBox() {
+            document.getElementById('info-box').style.display = 'block';
+            document.getElementById('minimized-box').style.display = 'none';
+        }
+
+        // Minimizar el cuadro informativo
+        function hideInfoBox() {
+            document.getElementById('info-box').style.display = 'none';
+            document.getElementById('minimized-box').style.display = 'block';
+        }
+
+        // Cerrar el cuadro informativo
+        document.getElementById('close-button').onclick = function() {
+            hideInfoBox();
+        };
+
+        // Mostrar el cuadro informativo al hacer clic en el ícono minimizado
+        document.getElementById('minimized-box').onclick = function() {
+            showInfoBox();
+        };
+
+        // Controlar la pantalla de bienvenida
+        document.getElementById('go-map').onclick = function() {
+            document.getElementById('welcome-screen').style.display = 'none';
+            showInfoBox();
+        };
+
+        document.getElementById('view-credits').onclick = function() {
+            alert('Desarrollado por [Tu Nombre]. Gracias por usar el mapa.');
+        };
+    </script>
+</body>
+</html>
